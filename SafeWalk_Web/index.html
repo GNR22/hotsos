@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SafeWalk Live Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        #status-box {
+            position: absolute; bottom: 20px; left: 20px; right: 20px;
+            background: white; padding: 15px; border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000;
+            text-align: center;
+        }
+        h2 { margin: 0 0 5px 0; color: #d32f2f; }
+        p { margin: 0; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div id="status-box">
+        <h2>🚨 Live Emergency Feed</h2>
+        <p id="info">Waiting for signal...</p>
+    </div>
+    
+    <div id="map"></div>
+
+    <script>
+        // --- CONFIGURATION: PASTE YOUR KEYS HERE ---
+        const supabaseUrl = 'https://oiwtnbgoqvmcerwpkxis.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pd3RuYmdvcXZtY2Vyd3BreGlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNjk3MTAsImV4cCI6MjA4NTc0NTcxMH0.WSsulZNSQs4wW0Mocfkk4aq-FLOSUyl4nc5DhRo7koI';
+        
+        // 1. Initialize Map
+        const map = L.map('map').setView([8.9492, 125.5430], 13); // Default: Butuan
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let marker = null;
+
+        // 2. Connect to Database
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 3. Listen for SOS Signals
+        console.log("Listening for emergency_alerts...");
+        
+        const channel = supabase
+            .channel('emergency_tracker')
+            .on(
+                'postgres_changes', 
+                { event: 'INSERT', schema: 'public', table: 'emergency_alerts' }, 
+                (payload) => {
+                    console.log("New Alert!", payload);
+                    const { latitude, longitude, user_id, created_at } = payload.new;
+
+                    // Update Status Text
+                    document.getElementById('info').innerText = 
+                        `Tracking User: ${user_id.slice(0,5)}... \n Last Update: ${new Date(created_at).toLocaleTimeString()}`;
+
+                    // Move Map Pin
+                    if (marker) {
+                        marker.setLatLng([latitude, longitude]);
+                    } else {
+                        marker = L.marker([latitude, longitude]).addTo(map)
+                            .bindPopup("🆘 HELP ME! I am here.").openPopup();
+                    }
+                    
+                    // Zoom to location
+                    map.setView([latitude, longitude], 18);
+                }
+            )
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    document.getElementById('info').innerText = "System Active. Waiting for SOS...";
+                }
+            });
+
+    </script>
+</body>
+</html>

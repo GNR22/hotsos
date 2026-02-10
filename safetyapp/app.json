@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "safetyapp",
+    "slug": "safetyapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/minions.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/minions.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/minions.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.gn22.safetyapp",
+      "versionCode": 3,
+      "permissions": [
+        "SEND_SMS",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "INTERNET"
+      ],
+      "intentFilters": [
+        {
+          "action": "android.intent.action.SENDTO",
+          "data": {
+            "scheme": "smsto"
+          }
+        }
+      ]
+    },
+    "plugins": ["expo-location"],
+    "extra": {
+      "eas": {
+        "projectId": "7b2f0bee-b58a-4a15-a071-d54ab6ce2e5e"
+      }
+    }
+  }
+}

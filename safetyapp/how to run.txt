@@ -1,0 +1,14 @@
+How to run 
+cd safetyapp
+
+(Starts the Expo dev server normally)
+npx expo start 
+
+or 
+
+(Starts Expo but clears the cache first) <-- RECOMMENDED
+npx expo start --clear 
+
+-then a qr code pops up. 
+-go to expo go app in android/ios
+-scan the the qr code then it takes you "safe walk" website using netlify. 

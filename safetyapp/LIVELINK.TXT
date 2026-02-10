@@ -1,0 +1,6 @@
+netlify live link:
+https://statuesque-crisp-47480a.netlify.app/
+
+
+apk link:
+https://expo.dev/accounts/gn22/projects/safetyapp/builds/f42a4b27-c44d-4de1-a9ed-308ff37b8de5

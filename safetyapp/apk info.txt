@@ -1,0 +1,7 @@
+Run this command to generate your APK:
+
+Bash terminal
+eas build -p android --profile preview
+
+What happens next? This will upload your code to Expo's servers. It will take about 10–20 minutes. 
+When it finishes, it will give you a QR code and a direct link to download the .apk file.

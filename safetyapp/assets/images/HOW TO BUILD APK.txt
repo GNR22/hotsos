@@ -1,0 +1,3 @@
+run in cd safetyapp
+eas build -p android --profile preview
+
