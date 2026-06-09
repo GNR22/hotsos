@@ -597,16 +597,162 @@ This configuration allows the database to **stream new rows through WebSockets**
 
 ---
 
-# 🧠 Summary
+# 🔧 Past Problems & Technical Bottlenecks
 
-The HotSOS alert delivery pipeline combines:
+The previous architecture relied on manual Firebase Cloud Messaging (FCM) integration, which proved unstable for this project due to the following issues:
 
-- **Device GPS hardware**
-- **Supabase Realtime database synchronization**
-- **Expo Push Notification routing**
-- **FCM / APNs platform messaging**
+## 1. Native Bridge Conflicts
+The application attempted to run two execution environments simultaneously:
 
-This architecture enables **real-time emergency communication** between victims and responders while maintaining a scalable cloud-based infrastructure.
+- JavaScript Thread (Expo/React Native)
+- Native Android Firebase SDK
+
+This resulted in:
+
+- Frequent compilation crashes
+- `ReferenceError` exceptions
+- Native bridge resolution failures
+- Inability to properly load the manually configured `google-services.json` file within the Expo development environment
+
+---
+
+## 2. Brittle Native Dependencies
+
+Because the application was tightly coupled with native Android SDKs:
+
+- Minor manifest misconfigurations caused complete startup failures
+- Debugging became significantly more difficult
+- Development workflow through VS Code was disrupted
+- Build consistency decreased across different environments
+
+---
+
+## 3. Failed Notification Triggers
+
+The native Firebase integration failed to properly register the **Emergency Notification Channels** with the Android operating system.
+
+As a result:
+
+- Emergency notifications could not bypass device silence settings
+- High-priority visual banners failed to appear consistently
+- Alert reliability was reduced during critical situations
+- The intended emergency response workflow became ineffective
+
+---
+
+## 4. Network Instability
+
+The application depended on direct and persistent socket connections to a local server instance.
+
+This introduced several issues:
+
+- Frequent connection timeouts
+- Unstable communication during network fluctuations
+- Repeated `"Network Request Failed"` loops
+- Reduced reliability during emergency reporting scenarios
+
+---
+
+# 🔮 Future References & Recommendations
+
+To improve the long-term reliability, scalability, and emergency-response effectiveness of the **HotSOS Platform**, the following enhancements are recommended:
+
+## 1. Transition to Hybrid Messaging
+
+The current implementation uses the **Expo Push API**, which follows a stable cloud-broker messaging architecture.
+
+Future versions should introduce SMS fallback capabilities through:
+
+- `expo-sms`
+- Twilio SMS Services
+- Alternative telecom-based notification providers
+
+### Benefits
+
+- SOS messages can still be delivered when mobile data is unavailable
+- Increased reliability in rural or disaster-affected areas
+- Reduces dependency on internet connectivity
+
+---
+
+## 2. Native Firebase Re-Integration
+
+For production-grade deployments, a controlled re-integration of the Firebase SDK through custom native modules is recommended.
+
+### Benefits
+
+- Full Firebase Cloud Messaging (FCM) control
+- Advanced notification customization
+- High-priority emergency channels
+- Better background delivery performance
+
+### Potential Features
+
+- Override Android "Do Not Disturb" (DND) settings
+- Trigger persistent alarm notifications
+- Continuous emergency alert sounds
+- Expanded notification channel management
+
+---
+
+## 3. Offline Map Caching
+
+Implement local map tile storage to maintain navigation functionality during connectivity loss.
+
+### Benefits
+
+- Responders can continue navigation without internet access
+- Access to victim's last known coordinates
+- Improved disaster-response reliability
+- Reduced dependency on live map downloads
+
+---
+
+## 4. Automated Context Capture
+
+Enhance the SOS activation workflow by automatically collecting contextual evidence during emergencies.
+
+### Possible Implementations
+
+- Capture a 10-second audio recording upon SOS activation
+- Automatically trigger the device camera
+- Collect surrounding environmental context
+- Attach media evidence to emergency reports
+
+### Benefits
+
+- Provides responders with immediate situational awareness
+- Improves emergency assessment accuracy
+- Enhances response decision-making
+- Creates additional evidence for incident documentation
+
+---
+
+### 🧠 Executive Summary: HotSOS
+
+HotSOS is a real-time, one-tap emergency response system engineered to minimize the critical time gap between incident occurrence and emergency notification. Developed as an undergraduate capstone project, the system utilizes a cloud-native architecture to provide reliable location-based distress alerts for vulnerable individuals.
+
+**Technical Foundation**
+
+The platform is built on a high-performance stack comprising React Native (Expo) for the mobile interface and Supabase (PostgreSQL) for the backend. By leveraging Supabase WebSockets (Realtime), HotSOS ensures that responders receive instantaneous updates without the need for manual refreshing. The notification system utilizes a robust, API-based push architecture—routing alerts through the Expo Push API to Google FCM and Apple APNs—to guarantee delivery even when the application is running in the background.
+
+**Problem Solving & Reliability**
+
+The system addresses common mobile development challenges through:
+
+`Infrastructure Decoupling`: By moving away from brittle, native-linked Firebase configurations, HotSOS now utilizes a cloud-broker API approach, significantly reducing application crashes and startup failures.
+
+`Real-time Synchronization`: The integration of WebSockets eliminates polling delays, ensuring that emergency events are propagated to trusted networks within milliseconds.
+
+`Scalable Architecture`: The platform is designed to handle user location data and emergency network management securely, governed by robust Row Level Security (RLS) policies.
+
+**Future-Proofing**
+
+While currently an internet-dependent system, the architecture is designed for modular expansion. Future development is prioritized for offline capability enhancements, including SMS fallback protocols for data-poor environments and native FCM re-integration to achieve deeper control over device-level notification behaviors (e.g., overriding DND modes).
+
+HotSOS represents a successful implementation of a scalable, web-connected safety tool that balances developer-friendly maintenance with the stringent reliability required for emergency services.
+
+---
 
 # 👥 Contributors
 
